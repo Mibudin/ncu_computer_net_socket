@@ -1,6 +1,6 @@
 #pragma once
-#ifndef WORLD_H
-#define WORLD_H
+#ifndef WORLD_HPP
+#define WORLD_HPP
 
 #include<vector>
 #include"cell.hpp"
@@ -11,7 +11,7 @@ namespace gol
 {
     // Forward declarations
     class Cell;
-    enum CellStatus : int;
+    enum class CellStatus : int;
 
 
     typedef std::vector<Cell*> WorldMapStreet;

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef TEXTAREA_H
-#define TEXTAREA_H
+#ifndef TEXTAREA_HPP
+#define TEXTAREA_HPP
 
 #include"renderee.hpp"
 #include"world.hpp"
@@ -8,12 +8,12 @@
 
 namespace gol
 {
-    enum BarType : int
+    enum class BarType : int
     {
         TOP, MID, BUT
     };
 
-    enum ModeType : int
+    enum class ModeType : int
     {
         SET, RUN
     };

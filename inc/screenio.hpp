@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SCREENIO_H
-#define SCREENIO_H
+#ifndef SCREENIO_HPP
+#define SCREENIO_HPP
 
 #include<termios.h>
 

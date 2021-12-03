@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KEYIO_H
-#define KEYIO_H
+#ifndef KEYIO_HPP
+#define KEYIO_HPP
 
 #include<future>
 

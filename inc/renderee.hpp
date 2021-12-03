@@ -1,6 +1,6 @@
 #pragma once
-#ifndef RENDEREE_H
-#define RENDEREE_H
+#ifndef RENDEREE_HPP
+#define RENDEREE_HPP
 
 #include"renderer.hpp"
 

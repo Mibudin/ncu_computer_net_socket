@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CELL_H
-#define CELL_H
+#ifndef CELL_HPP
+#define CELL_HPP
 
 #include"world.hpp"
 
@@ -21,7 +21,7 @@ namespace gol
          { 0, -1},           { 0,  1},
          { 1, -1}, { 1,  0}, { 1,  1}};
 
-    enum CellStatus : int
+    enum class CellStatus : int
     {
         DEAD = 0, LIVE = 1
     };

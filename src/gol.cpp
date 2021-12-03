@@ -214,8 +214,8 @@ void loop()
         thW->join();  // Process turn i + 1 complete
         thR->join();  // Render turn i complete
 
-        free(thW); thW = nullptr;
-        free(thR); thR = nullptr;
+        delete thW; thW = nullptr;
+        delete thR; thR = nullptr;
 
         std::this_thread::sleep_until(tp);
 
@@ -243,13 +243,13 @@ void deinit()
     wld->deinit();
     sio->deinitTty();
 
-    free(wld);
-    free(sio);
-    free(kio);
-    free(rer);
+    delete wld;
+    delete sio;
+    delete kio;
+    delete rer;
 
-    if(thW != nullptr) free(thW);
-    if(thR != nullptr) free(thR);
+    if(thW != nullptr) delete thW;
+    if(thR != nullptr) delete thR;
 
     exit(0);
     return;

@@ -13,7 +13,7 @@ namespace gol
         this->start = (WORLD_WIDTH << 1) + 7;
         this->width = SCREEN_WIDTH - ((WORLD_WIDTH << 1) + 2 + 8);
 
-        this->mode = SET;
+        this->mode = ModeType::SET;
     }
 
     void Textarea::setMode(const ModeType mode)
@@ -36,9 +36,9 @@ namespace gol
         printf(CUP(%d, %d), y, start);
         switch(type)
         {
-            case TOP: printf(DEC_VBHR CUF(%d) DEC_VBHL, width); break;
-            case MID: printf(DEC_VFHR CUF(%d) DEC_VFHL, width); break;
-            case BUT: printf(DEC_VTHR CUF(%d) DEC_VTHL, width); break;
+            case BarType::TOP: printf(DEC_VBHR CUF(%d) DEC_VBHL, width); break;
+            case BarType::MID: printf(DEC_VFHR CUF(%d) DEC_VFHL, width); break;
+            case BarType::BUT: printf(DEC_VTHR CUF(%d) DEC_VTHL, width); break;
         }
 
         printf(CHA(%d), start + 1);
@@ -61,8 +61,8 @@ namespace gol
         printf(CUP(6, %d) ECH(12), start + 2);
         switch(mode)
         {
-            case SET: printf(SGR_CLOR(49, 96) SGR_UDLN "Map " SGR_BDBR "Set" SGR_NOBB " Mode" SGR_DEFT); break;
-            case RUN: printf(SGR_CLOR(49, 96) SGR_UDLN "Map " SGR_BDBR "Run" SGR_NOBB " Mode" SGR_DEFT); break;
+            case ModeType::SET: printf(SGR_CLOR(49, 96) SGR_UDLN "Map " SGR_BDBR "Set" SGR_NOBB " Mode" SGR_DEFT); break;
+            case ModeType::RUN: printf(SGR_CLOR(49, 96) SGR_UDLN "Map " SGR_BDBR "Run" SGR_NOBB " Mode" SGR_DEFT); break;
         }
         // Turn
         printf(CUP(8, %d) ECH(6), start + 8);
@@ -79,7 +79,7 @@ namespace gol
         // Control Guide
         switch(mode)
         {
-            case SET:
+            case ModeType::SET:
                 printf(CUP(15, %d) ECH(12), start + 2);
                 printf(SGR_CLOR(49, 95) SGR_BDBR "W" SGR_DEFT ", "
                        SGR_CLOR(49, 95) SGR_BDBR "A" SGR_DEFT ", "
@@ -100,7 +100,7 @@ namespace gol
                 printf(CUP(22, %d) ECH(12), start + 2);
                 printf(SGR_CLOR(49, 95) SGR_BDBR "P" SGR_DEFT ": Exit game");
                 break;
-            case RUN:
+            case ModeType::RUN:
                 printf(CUP(15, %d) ECH(12), start + 2);
                 printf(SGR_CLOR(49, 95) SGR_BDBR ";" SGR_DEFT ": Slower");
                 printf(CUP(16, %d) ECH(12), start + 2);
@@ -126,24 +126,24 @@ namespace gol
         ANSIES(DEC(0));
 
         // Title
-        renderBar(2, TOP);
+        renderBar(2, BarType::TOP);
         renderSpace(3);
-        renderBar(4, BUT);
+        renderBar(4, BarType::BUT);
         // Phase
-        renderBar(5, TOP);
+        renderBar(5, BarType::TOP);
         renderSpace(6);
         // Turn
-        renderBar(7, MID);
+        renderBar(7, BarType::MID);
         renderSpace(8);
         // Turn Period
-        renderBar(9, MID);
+        renderBar(9, BarType::MID);
         renderSpace(10);
         // Cell Counts
-        renderBar(11, MID);
+        renderBar(11, BarType::MID);
         renderSpace(12);
         renderSpace(13);
         // Control Guide
-        renderBar(14, MID);
+        renderBar(14, BarType::MID);
         renderSpace(15);
         renderSpace(16);
         renderSpace(17);
@@ -152,7 +152,7 @@ namespace gol
         renderSpace(20);
         renderSpace(21);
         renderSpace(22);
-        renderBar(23, BUT);
+        renderBar(23, BarType::BUT);
 
         ANSIES(DEC(B));
 

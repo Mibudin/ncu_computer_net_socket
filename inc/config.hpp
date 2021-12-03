@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
 /**
  * Configurations

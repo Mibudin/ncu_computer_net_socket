@@ -9,8 +9,8 @@ namespace gol
 {
     Cell::Cell()
     {
-        status[0] = DEAD;
-        status[1] = DEAD;
+        status[0] = CellStatus::DEAD;
+        status[1] = CellStatus::DEAD;
     }
 
     CellStatus* Cell::getStatus()
@@ -40,8 +40,8 @@ namespace gol
         printf(CUP(%d, %d), y + 3, (x << 1) + 5 + 1);
         switch(status[turn & 1])
         {
-            case DEAD: printf(SGR_CLOR(49, 31) ". " SGR_DEFT); break;
-            case LIVE: printf(SGR_CLOR(49, 92) SGR_BDBR "O " SGR_DEFT); break;
+            case CellStatus::DEAD: printf(SGR_CLOR(49, 31) ". " SGR_DEFT); break;
+            case CellStatus::LIVE: printf(SGR_CLOR(49, 92) SGR_BDBR "O " SGR_DEFT); break;
         }
         fflush(nullptr);
 
@@ -63,7 +63,7 @@ namespace gol
                  if(q < 0)        q += size[1];
             else if(q >= size[1]) q -= size[1];
 
-            liveCellCount += (*map)[q][p]->getStatus()[t] == LIVE ? 1 : 0;  // LIVE = 1
+            liveCellCount += (*map)[q][p]->getStatus()[t] == CellStatus::LIVE ? 1 : 0;  // LIVE = 1
         }
         // if(liveCellCount != 0) printf("> %d, %d > %d\n", x, y, liveCellCount);
         
@@ -74,14 +74,14 @@ namespace gol
     {
         switch(status[t])
         {
-            case DEAD:
-                if(liveCellCount == 3) return LIVE;
-                else                   return DEAD;
+            case CellStatus::DEAD:
+                if(liveCellCount == 3) return CellStatus::LIVE;
+                else                   return CellStatus::DEAD;
                 break;
-            case LIVE:
-                     if(liveCellCount < 2) return DEAD;
-                else if(liveCellCount > 3) return DEAD;
-                else                       return LIVE;
+            case CellStatus::LIVE:
+                     if(liveCellCount < 2) return CellStatus::DEAD;
+                else if(liveCellCount > 3) return CellStatus::DEAD;
+                else                       return CellStatus::LIVE;
                 break;
         }
     }

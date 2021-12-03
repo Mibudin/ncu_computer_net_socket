@@ -102,7 +102,7 @@ namespace gol
             WorldMapStreet* wms = &(map[i]);
             for(int j = 0; j < size[0]; j++)
             {
-                if((*wms)[j]->getStatus()[t] == LIVE) liveCount[t]++;
+                if((*wms)[j]->getStatus()[t] == CellStatus::LIVE) liveCount[t]++;
             }
         }
 
