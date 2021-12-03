@@ -38,7 +38,9 @@ namespace gol
 
         tcflush(0, TCIFLUSH);
 
-        while(!kbhit());
+        // While setting the VMIN in TTY info as 1,
+        // there is no need to use kbhit (which is busy-wait) anymore.
+        // while(!kbhit());
 
         lastKey = getch();
 

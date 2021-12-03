@@ -50,6 +50,7 @@
         "condition_variable": "cpp",
         "future": "cpp",
         "iostream": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "cstring": "cpp"
     }
 }
