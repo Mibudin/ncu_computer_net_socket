@@ -1,4 +1,4 @@
-# For NCU Operating System Homework
+# For NCU Computer Network Homework
 # 	For programs uploaded onto Online Judge. (Or not XD)
 # 
 # 	Specified Language:
