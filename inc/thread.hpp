@@ -28,15 +28,19 @@ namespace gol
         Thread(ThreadTask task);
         virtual ~Thread();
         ThreadState getState() const;
+        void deletePromise();
         std::future<int>* nextPromise();
+        std::future<int>* currentPromise();
+        bool getPromiseReady() const;
         void start();
         void stop();
-        void pause();
         void resume();
+        void storrs();
 
     private:
         ThreadTask task;
         std::promise<int>** p;
+        std::future<int>* f;
         std::thread* th;
         std::mutex mtx;
         std::condition_variable cv;
@@ -44,6 +48,7 @@ namespace gol
         std::atomic_bool pauseFlag;
         std::atomic_bool stopFlag;
         std::atomic<ThreadState> state;
+        void pause();
         void run(std::promise<int>** p);
     };
 }

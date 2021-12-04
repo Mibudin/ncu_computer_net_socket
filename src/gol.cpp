@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<unistd.h>
+#include<signal.h>
 #include<thread>
 #include"config.hpp"
 #include"cell.hpp"
@@ -23,9 +24,12 @@ gol::Screenio* sio;
 gol::Keyio*    kio;
 gol::Renderer* rer;
 
-std::thread* thW;
-std::thread* thR;
-std::thread* thK;
+// std::thread* thW;
+// std::thread* thR;
+// std::thread* thK;
+
+gol::Thread* thW;
+gol::Thread* thR;
 
 std::chrono::steady_clock::duration dur;
 std::chrono::steady_clock::time_point tp;
@@ -62,6 +66,9 @@ void init()
     rer->addRenderee(tta);
 
     rer->renderInit();
+
+    signal(SIGINT,  [](int sig){deinit(); exit(1);});
+    signal(SIGTERM, [](int sig){deinit(); exit(1);});
 
     return;
 }
@@ -172,12 +179,19 @@ void loop()
 
     kio->startWait();
 
+    thW = new gol::Thread({
+        [](void* ths){return ((gol::World*)ths)->goTurn();}, wld});
+    thR = new gol::Thread({
+        [](void* ths){((gol::Renderer*)ths)->renderAll(); return 0;}, rer});
+
     for(int i = 0; contLoop && i < TURN_MAX; i++)
     {
         tp = std::chrono::steady_clock::now() + dur;
 
-        thW = new std::thread(&gol::World::goTurn, wld);
-        thR = new std::thread(&gol::Renderer::renderAll, rer);
+        // thW = new std::thread(&gol::World::goTurn, wld);
+        // thR = new std::thread(&gol::Renderer::renderAll, rer);
+        thW->nextPromise(); thW->storrs();
+        thR->nextPromise(); thR->storrs();
 
         if(kio->waitKeyAsync(tp))
         {
@@ -211,11 +225,13 @@ void loop()
             if(nextWait) kio->startWait();
         }
 
-        thW->join();  // Process turn i + 1 complete
-        thR->join();  // Render turn i complete
+        // thW->join();  // Process turn i + 1 complete
+        // thR->join();  // Render turn i complete
+        thW->currentPromise()->wait();
+        thR->currentPromise()->wait();
 
-        delete thW; thW = nullptr;
-        delete thR; thR = nullptr;
+        // delete thW; thW = nullptr;
+        // delete thR; thR = nullptr;
 
         std::this_thread::sleep_until(tp);
 

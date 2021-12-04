@@ -14,7 +14,7 @@ namespace gol
 
         ANSIES(ASB);
 
-        // tty.c_lflag |= ~ECHO;  // Enable
+        // tty.c_lflag |=  ECHO;  // Enable
         // tty.c_lflag &= ~ECHO;  // Disable
 
         getTty();

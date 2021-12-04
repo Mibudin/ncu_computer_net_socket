@@ -5,21 +5,53 @@
 #include<future>
 #include<termios.h>
 #include"keyio.hpp"
+#include"thread.hpp"
 
 
 namespace gol
 {
+    Keyio::Keyio()
+    {
+        kinth == nullptr;
+        // kinf == nullptr;
+    }
+
     void Keyio::startWait()
     {
-        kin = std::async(std::launch::async, &gol::Keyio::blockWaitKey, this);
+        // kin = std::async(std::launch::async, &gol::Keyio::blockWaitKey, this);
+
+        if(kinth != nullptr && kinth->getState() == ThreadState::STOPPED)
+        {
+            delete kinth;
+            // delete kinf;
+            kinth = nullptr;
+            // kinf = nullptr;
+        }
+        if(kinth == nullptr)
+        {
+            kinth = new Thread({
+                [](void* ths){return ((Keyio*)ths)->blockWaitKey();}, this});
+            // kinf = kinth->nextPromise();
+            kinth->nextPromise();
+            kinth->start();
+        }
+        else if(kinth->getState() == ThreadState::PAUSED)
+        {
+            // kinf = kinth->nextPromise();
+            kinth->nextPromise();
+            kinth->resume();
+        }
 
         return;
     }
 
     bool Keyio::waitKeyAsync(const std::chrono::steady_clock::time_point time)
     {
-        bool ready = kin.wait_until(time) == std::future_status::ready;
+        // bool ready = kin.wait_until(time) == std::future_status::ready;
         // if(ready) lastKey = kin.get();
+
+        bool ready = kinth->currentPromise()->wait_until(time)
+                     == std::future_status::ready;
 
         return ready;
     }
