@@ -10,6 +10,7 @@
 #include"keyio.hpp"
 #include"renderer.hpp"
 #include"renderee.hpp"
+#include"pane.hpp"
 
 
 void init();
@@ -19,10 +20,15 @@ void deinit();
 
 
 gol::World*    wld;
-gol::Textarea* tta;
+// gol::Textarea* tta;
 gol::Screenio* sio;
 gol::Keyio*    kio;
 gol::Renderer* rer;
+
+gol::WorldPane*   wldp;
+gol::TitlePane*   ttlp;
+gol::InfoPane*    infp;
+gol::NetworkPane* netp;
 
 // std::thread* thW;
 // std::thread* thR;
@@ -51,10 +57,15 @@ int main()
 void init()
 {
     wld = new gol::World(WORLD_WIDTH, WORLD_HEIGHT);
-    tta = new gol::Textarea(wld);
+    // tta = new gol::Textarea(wld);
     sio = new gol::Screenio();
     kio = new gol::Keyio();
     rer = new gol::Renderer();
+
+    wldp = new gol::WorldPane(wld, 2, 1);
+    ttlp = new gol::TitlePane(    16,  3, (WORLD_WIDTH << 1) + 6, 1);
+    infp = new gol::InfoPane(wld, 16, 21, (WORLD_WIDTH << 1) + 6, 4);
+    netp = new gol::NetworkPane((WORLD_WIDTH << 1) + 3, 3, 2, WORLD_HEIGHT + 3);
 
     dur = std::chrono::milliseconds(gol::turnPeriod);
 
@@ -62,8 +73,12 @@ void init()
 
     sio->initTty();
 
-    rer->addRenderee(wld);
-    rer->addRenderee(tta);
+    // rer->addRenderee(wld);
+    // rer->addRenderee(tta);
+    rer->addRenderee(wldp);
+    rer->addRenderee(ttlp);
+    rer->addRenderee(infp);
+    rer->addRenderee(netp);
 
     rer->renderInit();
 
@@ -83,11 +98,12 @@ void setMap(const int turn)
     int x = 0, y = 0;
     int t = turn & 1;
 
-    tta->setMode(gol::ModeType::SET);
+    // tta->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
+    infp->setMode(gol::ModeType::SET);
 
     rer->renderAll();
 
-    ANSIES(CUP(3, 6) CUS);
+    ANSIES(CUP(2, 4) CUS);
 
     while(nextWait && kio->blockWaitKey())
     {
@@ -175,7 +191,8 @@ void loop()
     bool backSet = false;
     bool goDeinit = false;
 
-    tta->setMode(gol::ModeType::RUN);
+    // tta->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
+    infp->setMode(gol::ModeType::RUN);
 
     kio->startWait();
 
@@ -240,7 +257,8 @@ void loop()
         {
             backSet = false;
             setMap(wld->getTurn());
-            tta->setMode(gol::ModeType::RUN);
+            // tta->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
+            infp->setMode(gol::ModeType::RUN);
             wld->backTurn();
 
             kio->startWait();
@@ -260,9 +278,14 @@ void deinit()
     sio->deinitTty();
 
     delete wld;
+    // delete tta;
     delete sio;
     delete kio;
     delete rer;
+
+    delete wldp;
+    delete ttlp;
+    delete infp;
 
     if(thW != nullptr) delete thW;
     if(thR != nullptr) delete thR;

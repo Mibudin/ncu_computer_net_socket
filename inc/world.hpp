@@ -5,6 +5,7 @@
 #include<vector>
 #include"cell.hpp"
 #include"renderee.hpp"
+#include"pane.hpp"
 
 
 namespace gol
@@ -18,8 +19,10 @@ namespace gol
     typedef std::vector<WorldMapStreet> WorldMap;
 
 
-    class World : public IRenderee
+    class World
     {
+        friend class WorldPane;
+
     public:
         World(const int width, const int height);
         void deinit();
@@ -39,14 +42,26 @@ namespace gol
         int liveCount[2];
         WorldMap map;  // map[y][x]
         void updateAllMap();
-        void updateAllCells();
-        void updateACell(const int i);
-        void updateACell(const int x, const int y);
+        // void updateAllCells();
+        // void updateACell(const int i);
+        // void updateACell(const int x, const int y);
         void setMap();
         void fillMap();
-        bool needRender();
-        void render();
-        void renderInit();
+        // bool needRender() override;
+        // void render() override;
+        // void renderInit() override;
+    };
+
+    class WorldPane : public Pane
+    {
+    public:
+        WorldPane(World* wld, const int x, const int y);
+
+    protected:
+        void render() override;
+
+    private:
+        World* wld;
     };
 }
 

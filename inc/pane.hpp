@@ -10,12 +10,25 @@ namespace gol
     class Pane : public IRenderee
     {
     public:
-        Pane();
+        Pane(const int width, const int height,
+             const int x, const int y);
+        void setAdjacency(const bool top, const bool bottom,
+                          const bool left, const bool right);
+        void renderDividerH(const int row);
+        void renderDividerV(const int col);
+
+    protected:
+        int pos[2];
+        int size[2];
+        virtual bool needRender() override;
+        virtual void render() override;
+        virtual void renderInit() override;
 
     private:
-        bool needRender();
-        void render();
-        void renderInit();
+        int adj[4];
+        void renderCorner();
+        void renderEdge();
+        void renderBorder();
     };
 }
 

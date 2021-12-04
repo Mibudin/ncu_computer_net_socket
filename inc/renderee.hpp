@@ -13,7 +13,7 @@ namespace gol
     public:
         ;
 
-    private:
+    protected:
         virtual bool needRender() = 0;
         virtual void render() = 0;
         virtual void renderInit() = 0;

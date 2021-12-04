@@ -37,7 +37,8 @@ namespace gol
 
     void Cell::render(const int x, const int y, const int turn)
     {
-        printf(CUP(%d, %d), y + 3, (x << 1) + 5 + 1);
+        // printf(CUP(%d, %d), y + 3, (x << 1) + 5 + 1);
+        printf(CUP(%d, %d), y, x);
         switch(status[turn & 1])
         {
             case CellStatus::DEAD: printf(SGR_CLOR(49, 31) ". " SGR_DEFT); break;

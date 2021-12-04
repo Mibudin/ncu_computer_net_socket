@@ -122,8 +122,6 @@ namespace gol
                     (*p)->set_value(value);
                     promiseFlag = true;
                     pause();
-                    // TODO: Pause for future
-                    // TODO: Join
                 }
             }
 

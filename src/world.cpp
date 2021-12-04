@@ -39,7 +39,8 @@ namespace gol
 
         // return ++turn;
 
-        updateAllCells();
+        // updateAllCells();
+        updateAllMap();
 
         countAllCells((turn & 1) ^ 1);
 
@@ -124,29 +125,29 @@ namespace gol
         return;
     }
 
-    void World::updateAllCells()
-    {
-        for(int i = 0; i < size[0] * size[1]; i++)
-        {
-            updateACell(i);
-        }
+    // void World::updateAllCells()
+    // {
+    //     for(int i = 0; i < size[0] * size[1]; i++)
+    //     {
+    //         updateACell(i);
+    //     }
 
-        return;
-    }
+    //     return;
+    // }
 
-    void World::updateACell(const int i)
-    {
-        updateACell(i % size[0], i / size[0]);
+    // void World::updateACell(const int i)
+    // {
+    //     updateACell(i % size[0], i / size[0]);
 
-        return;
-    }
+    //     return;
+    // }
 
-    void World::updateACell(const int x, const int y)
-    {
-        map[y][x]->interact(&map, size, x, y, turn);
+    // void World::updateACell(const int x, const int y)
+    // {
+    //     map[y][x]->interact(&map, size, x, y, turn);
 
-        return;
-    }
+    //     return;
+    // }
 
     void World::setMap()
     {
@@ -171,65 +172,88 @@ namespace gol
         return;
     }
 
-    bool World::needRender()
+    // bool World::needRender()
+    // {
+    //     return true;
+    // }
+
+    // void World::render()
+    // {
+    //     // ANSIES(SCP CUP(3, 5));
+
+    //     WorldMapStreet* wms;
+    //     for(int i = 0; i < size[1]; i++)
+    //     {
+    //         WorldMapStreet* wms = &(map[i]);
+    //         for(int j = 0; j < size[0]; j++)
+    //         {
+    //             // switch((*wms)[j]->getStatus()[turn & 1])
+    //             // {
+    //             //     case DEAD: printf(". "); break;
+    //             //     case LIVE: printf("O "); break;
+    //             // }
+    //             (*wms)[j]->render(j, i, turn);
+    //         }
+    //         // ANSIES("\n" CHA(5));
+    //     }
+
+    //     return;
+    // }
+
+    // void World::renderInit()
+    // {
+    //     ANSIES(DEC(0) CUP(2, 4));
+    //     printf(DEC_VBHR);
+    //     for(int i = 0; i < (size[0] << 1) + 1; i++)
+    //     {
+    //         printf(DEC_VNHF);
+    //     }
+    //     printf(DEC_VBHL);
+
+    //     ANSIES(CUP(23, 4));
+    //     printf(DEC_VTHR);
+    //     for(int i = 0; i < (size[0] << 1) + 1; i++)
+    //     {
+    //         printf(DEC_VNHF);
+    //     }
+    //     printf(DEC_VTHL);
+
+    //     ANSIES(CUP(3, 4));
+    //     for(int i = 0; i < size[1]; i++)
+    //     {
+    //         printf(DEC_VFHN CUB(1) CUD(1));
+    //     }
+
+    //     printf(CUP(3, %d), 4 + (size[0] << 1) + 2);
+    //     for(int i = 0; i < size[1]; i++)
+    //     {
+    //         printf(DEC_VFHN CUB(1) CUD(1));
+    //     }
+
+    //     ANSIES(DEC(B));
+
+    //     return;
+    // }
+
+    WorldPane::WorldPane(World* wld, const int x, const int y)
+        : Pane((wld->getSize()[0] << 1) + 3, wld->getSize()[1] + 2, x, y)
     {
-        return true;
+        this->wld = wld;
     }
 
-    void World::render()
+    void WorldPane::render()
     {
-        // ANSIES(SCP CUP(3, 5));
-
-        WorldMapStreet* wms;
-        for(int i = 0; i < size[1]; i++)
+        int x, y = 0;
+        for(WorldMapStreet wms : wld->map)
         {
-            WorldMapStreet* wms = &(map[i]);
-            for(int j = 0; j < size[0]; j++)
+            x = 0;
+            for(Cell* c : wms)
             {
-                // switch((*wms)[j]->getStatus()[turn & 1])
-                // {
-                //     case DEAD: printf(". "); break;
-                //     case LIVE: printf("O "); break;
-                // }
-                (*wms)[j]->render(j, i, turn);
+                c->render(pos[0] + (x << 1) + 2, pos[1] + y + 1, wld->turn);
+                x++;
             }
-            // ANSIES("\n" CHA(5));
+            y++;
         }
-
-        return;
-    }
-
-    void World::renderInit()
-    {
-        ANSIES(DEC(0) CUP(2, 4));
-        printf(DEC_VBHR);
-        for(int i = 0; i < (size[0] << 1) + 1; i++)
-        {
-            printf(DEC_VNHF);
-        }
-        printf(DEC_VBHL);
-
-        ANSIES(CUP(23, 4));
-        printf(DEC_VTHR);
-        for(int i = 0; i < (size[0] << 1) + 1; i++)
-        {
-            printf(DEC_VNHF);
-        }
-        printf(DEC_VTHL);
-
-        ANSIES(CUP(3, 4));
-        for(int i = 0; i < size[1]; i++)
-        {
-            printf(DEC_VFHN CUB(1) CUD(1));
-        }
-
-        printf(CUP(3, %d), 4 + (size[0] << 1) + 2);
-        for(int i = 0; i < size[1]; i++)
-        {
-            printf(DEC_VFHN CUB(1) CUD(1));
-        }
-
-        ANSIES(DEC(B));
 
         return;
     }
