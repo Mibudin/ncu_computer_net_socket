@@ -38,12 +38,17 @@ namespace gol
     {
     public:
         Config(const std::string filename);
+        // sizes
         int screenWidth;
         int screenHeight;
         int worldWidth;
         int worldHeight;
+        // runs
         int turnPeriod;
         int turnMax;
+        // server
+        std::string server_ip_addr;
+        int server_port;
     };
 
     extern Config* cfg;

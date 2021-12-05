@@ -6,7 +6,7 @@ namespace gol
 {
     // int gol::turnPeriod = TURN_PERIOD;
 
-    Config* cfg;
+    Config* cfg = nullptr;
 
 
     void loadConfig(const std::string filename)
@@ -26,7 +26,11 @@ namespace gol
         screenHeight = std::stoi(ini["sizes"]["screen_height"]);
         worldWidth   = std::stoi(ini["sizes"]["world_width"  ]);
         worldHeight  = std::stoi(ini["sizes"]["world_height" ]);
-        turnPeriod   = std::stoi(ini["run"  ]["turn_period"  ]);
-        turnMax      = std::stoi(ini["run"  ]["turn_max"     ]);
+
+        turnPeriod = std::stoi(ini["run"]["turn_period"]);
+        turnMax    = std::stoi(ini["run"]["turn_max"   ]);
+
+        server_ip_addr =           ini["server"]["ip_addr"];
+        server_port    = std::stoi(ini["server"]["port"   ]);
     }
 }

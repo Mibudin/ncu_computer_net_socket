@@ -20,7 +20,6 @@ void deinit();
 
 
 gol::World*    wld;
-// gol::Textarea* tta;
 gol::Screenio* sio;
 gol::Keyio*    kio;
 gol::Renderer* rer;
@@ -29,10 +28,6 @@ gol::WorldPane*   wldp;
 gol::TitlePane*   ttlp;
 gol::InfoPane*    infp;
 gol::NetworkPane* netp;
-
-// std::thread* thW;
-// std::thread* thR;
-// std::thread* thK;
 
 gol::Thread* thW;
 gol::Thread* thR;
@@ -59,7 +54,6 @@ void init()
     gol::loadConfig(DEFAULT_CONFIG_FILE);
 
     wld = new gol::World(gol::cfg->worldWidth, gol::cfg->worldHeight);
-    // tta = new gol::Textarea(wld);
     sio = new gol::Screenio();
     kio = new gol::Keyio();
     rer = new gol::Renderer();
@@ -75,8 +69,6 @@ void init()
 
     sio->initTty();
 
-    // rer->addRenderee(wld);
-    // rer->addRenderee(tta);
     rer->addRenderee(wldp);
     rer->addRenderee(ttlp);
     rer->addRenderee(infp);
@@ -100,8 +92,7 @@ void setMap(const int turn)
     int x = 0, y = 0;
     int t = turn & 1;
 
-    // tta->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
-    infp->setMode(gol::ModeType::SET);
+    infp->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
 
     rer->renderAll();
 
@@ -193,8 +184,7 @@ void loop()
     bool backSet = false;
     bool goDeinit = false;
 
-    // tta->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
-    infp->setMode(gol::ModeType::RUN);
+    infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
 
     kio->startWait();
 
@@ -207,8 +197,6 @@ void loop()
     {
         tp = std::chrono::steady_clock::now() + dur;
 
-        // thW = new std::thread(&gol::World::goTurn, wld);
-        // thR = new std::thread(&gol::Renderer::renderAll, rer);
         thW->nextPromise(); thW->storrs();
         thR->nextPromise(); thR->storrs();
 
@@ -245,13 +233,8 @@ void loop()
             else         break;
         }
 
-        // thW->join();  // Process turn i + 1 complete
-        // thR->join();  // Render turn i complete
-        thW->currentPromise()->wait();
-        thR->currentPromise()->wait();
-
-        // delete thW; thW = nullptr;
-        // delete thR; thR = nullptr;
+        thW->currentPromise()->wait();  // Process turn i + 1 complete
+        thR->currentPromise()->wait();  // Render turn i complete
 
         std::this_thread::sleep_until(tp);
 
@@ -260,8 +243,7 @@ void loop()
         {
             backSet = false;
             setMap(wld->getTurn());
-            // tta->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
-            infp->setMode(gol::ModeType::RUN);
+            infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
             wld->backTurn();
 
             kio->startWait();
@@ -281,7 +263,6 @@ void deinit()
     sio->deinitTty();
 
     delete wld;
-    // delete tta;
     delete sio;
     delete kio;
     delete rer;

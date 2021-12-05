@@ -35,6 +35,9 @@ LIB_DIR	:= ./lib
 
 # Set the needed object files
 OBJS	:= $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(wildcard $(SRC_DIR)/*.cpp))
+OBJS_O	:= $(filter-out $(OBJ_DIR)/gols.o $(OBJ_DIR)/golc.o, $(OBJS))
+OBJS_S	:= $(filter-out $(OBJ_DIR)/gol.o $(OBJ_DIR)/golc.o, $(OBJS))
+OBJS_C	:= $(filter-out $(OBJ_DIR)/gol.o $(OBJ_DIR)/gols.o, $(OBJS))
 
 # Set the libraries
 LIBS	:= 
@@ -44,21 +47,27 @@ endif
 
 # Problrms about names of files
 ifeq ($(OS), Windows_NT)
-EXECUTABLE	:= $(TARGET).exe
+EXEC_O	:= $(TARGET).exe
+EXEC_S	:= $(TARGET)s.exe
+EXEC_C	:= $(TARGET)c.exe
 RM	:= del
 else
-EXECUTABLE	:= $(TARGET)
+EXEC_O	:= $(TARGET)
+EXEC_S	:= $(TARGET)s
+EXEC_C	:= $(TARGET)c
 endif
 
 
 # Commands
 
 # Compile all the specified files (if needed)
-all: $(BIN_DIR)/$(EXECUTABLE)
+allo: $(BIN_DIR)/$(EXEC_O)
+alls: $(BIN_DIR)/$(EXEC_S)
+allc: $(BIN_DIR)/$(EXEC_C)
 
 # Clean all the executable files
 cleanbin:
-	$(RM) $(BIN_DIR)/$(EXECUTABLE)
+	$(RM) $(BIN_DIR)/$(EXEC_O) $(BIN_DIR)/$(EXEC_S) $(BIN_DIR)/$(EXEC_C)
 
 # Clean all the object files
 cleanobj:
@@ -68,13 +77,21 @@ cleanobj:
 clean: cleanbin cleanobj
 
 # Compile all the specified files (if needed), and excute them.
-run: all
-	$(BIN_DIR)/$(EXECUTABLE)
+run: allo
+	$(BIN_DIR)/$(EXEC_O)
+runs: alls
+	$(BIN_DIR)/$(EXEC_S)
+runc: allc
+	$(BIN_DIR)/$(EXEC_C)
 
 # Compile all the specific files to the object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(C_FLAGS) -I$(INC_DIR) -L$(LIB_DIR) $(LIBS) -c $< -o $@
 
 # Link the specified object file
-$(BIN_DIR)/$(EXECUTABLE): $(OBJS)
+$(BIN_DIR)/$(EXEC_O): $(OBJS_O)
+	$(CC) $(C_FLAGS) -I$(INC_DIR) -L$(LIB_DIR) $(LIBS) $^ -o $@
+$(BIN_DIR)/$(EXEC_S): $(OBJS_S)
+	$(CC) $(C_FLAGS) -I$(INC_DIR) -L$(LIB_DIR) $(LIBS) $^ -o $@
+$(BIN_DIR)/$(EXEC_C): $(OBJS_C)
 	$(CC) $(C_FLAGS) -I$(INC_DIR) -L$(LIB_DIR) $(LIBS) $^ -o $@
