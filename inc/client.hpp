@@ -16,6 +16,8 @@ namespace gol
         bool createSocket();
         bool connectServer();
         bool closeSocket();
+        std::string getClientIPAddr();
+        int getClientPort();
 
     private:
         int clientSocketFd;

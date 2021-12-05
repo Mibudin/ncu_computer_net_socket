@@ -71,10 +71,15 @@ namespace gol
     public:
         NetworkPane(const int width, const int height,
                     const int x, const int y);
+        void setConnect(const std::string ipAddr, const int port);
     
     protected:
         void render() override;
         void renderInit() override;
+
+    private:
+        std::string ipAddr;
+        int port;
     };
 }
 

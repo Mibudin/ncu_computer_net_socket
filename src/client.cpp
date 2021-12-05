@@ -44,6 +44,16 @@ namespace gol
         return true;
     }
 
+    std::string GolClient::getClientIPAddr()
+    {
+        return cfg->server_ip_addr;
+    }
+    
+    int GolClient::getClientPort()
+    {
+        return cfg->server_port;
+    }
+
     void GolClient::setAddr()
     {
         serverAddr.sin_family = AF_INET;

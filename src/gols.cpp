@@ -11,8 +11,10 @@
 #include"renderer.hpp"
 #include"renderee.hpp"
 #include"pane.hpp"
+#include"server.hpp"
 
 
+void preinit();
 void init();
 void setMap(const int turn);
 void loop();
@@ -35,9 +37,13 @@ gol::Thread* thR;
 std::chrono::steady_clock::duration dur;
 std::chrono::steady_clock::time_point tp;
 
+gol::GolServer* gols;
+
 
 int main()
 {
+    preinit();
+
     init();
 
     setMap(0);
@@ -49,10 +55,22 @@ int main()
     return 0;
 }
 
-void init()
+void preinit()
 {
+    printf("Loading configurations...\n");
     gol::loadConfig(DEFAULT_CONFIG_FILE);
 
+    gols = new gol::GolServer();
+    gols->createSocket();
+    gols->listenSocket();
+    printf("Waiting for the client...\n");
+    gols->acceptClient();
+
+    return;
+}
+
+void init()
+{
     wld = new gol::World(gol::cfg->worldWidth, gol::cfg->worldHeight);
     sio = new gol::Screenio();
     kio = new gol::Keyio();
@@ -62,6 +80,7 @@ void init()
     ttlp = new gol::TitlePane(    16,  3, (gol::cfg->worldWidth << 1) + 6, 1);
     infp = new gol::InfoPane(wld, 16, 21, (gol::cfg->worldWidth << 1) + 6, 4);
     netp = new gol::NetworkPane((gol::cfg->worldWidth << 1) + 3, 3, 2, gol::cfg->worldHeight + 3);
+    netp->setConnect(gols->getClientIPAddr(), gols->getClientPort());
 
     dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
 
@@ -259,6 +278,8 @@ void loop()
 
 void deinit()
 {
+    gols->closeSocket();
+
     wld->deinit();
     sio->deinitTty();
 

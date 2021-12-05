@@ -318,7 +318,17 @@ namespace gol
 
     NetworkPane::NetworkPane(const int width, const int height,
                              const int x, const int y)
-        : Pane(width, height, x, y){}
+        : Pane(width, height, x, y)
+    {
+        ipAddr = "";
+        port = 0;
+    }
+
+    void NetworkPane::setConnect(const std::string ipAddr, const int port)
+    {
+        this->ipAddr = ipAddr;
+        this->port = port;
+    }
 
     void NetworkPane::render()  // TODO
     {
@@ -328,7 +338,12 @@ namespace gol
     void NetworkPane::renderInit()
     {
         Pane::renderInit();
-        renderDividerV(19);
+        renderDividerV(25);
+
+        if(port == 0) return;
+
+        printf(CUP(%d, %d), pos[1] + 1, pos[0] + 2);
+        printf(SGR_CLOR(49, 94) SGR_BDBR "%s" SGR_DEFT ":%d", ipAddr, port);
 
         return;
     }

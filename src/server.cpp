@@ -63,6 +63,37 @@ namespace gol
         return true;
     }
 
+    bool GolServer::closeClientSocket()
+    {
+        if(close(clientSocketFd) < 0) return false;
+        clientSocketFd = -1;
+
+        return true;
+    }
+
+    std::string GolServer::getClientIPAddr()
+    {
+        char ipAddr[20];
+        inet_ntop(AF_INET, &clientAddr.sin_addr.s_addr, ipAddr, sizeof(ipAddr));
+
+        return std::string(ipAddr);
+    }
+    
+    int GolServer::getClientPort()
+    {
+        return ntohs(clientAddr.sin_port);
+    }
+
+    void GolServer::sendMsgPacket(const MsgPacket* pkt)  // TODO
+    {
+
+    }
+
+    MsgPacket* GolServer::recvMsgPacket()  // TODO
+    {
+
+    }
+
     void GolServer::setAddr()
     {
         serverAddr.sin_family = AF_INET;
