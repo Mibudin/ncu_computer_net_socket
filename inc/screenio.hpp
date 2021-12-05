@@ -83,7 +83,7 @@
 #define DEC_VFHN "x"  // (0x78) │	
 
 // Other Tools
-#define ANSIES(s) do{printf((s)); fflush(nullptr);}while(0);  // Shorter expression for print and flush
+#define ANSIES(s) do{printf((s)); fflush(stdout);}while(0);  // Shorter expression for print and flush
 // #define vCUP(n, m) do{printf(CUP(%d, %d), n, m); fflush(nullptr);}while(0);
 
 

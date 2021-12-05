@@ -2,6 +2,7 @@
 #include"config.hpp"
 #include"textarea.hpp"
 #include"screenio.hpp"
+#include"config.hpp"
 
 
 namespace gol
@@ -231,14 +232,14 @@ namespace gol
 
         // Turn Period
         printf(CUP(%d, %d) ECH(6), pos[1] + 5, pos[0] + 8);
-        printf(SGR_CLOR(49, 93) "%d" SGR_DEFT, turnPeriod);
+        printf(SGR_CLOR(49, 93) "%d" SGR_DEFT, cfg->turnPeriod);
 
         // Cell Counts
         int lives = wld->getLiveCount();
         printf(CUP(%d, %d) ECH(3), pos[1] + 7, pos[0] + 11);
         printf(SGR_CLOR(49, 92) "%d" SGR_DEFT, lives);
         printf(CUP(%d, %d) ECH(3), pos[1] + 8, pos[0] + 11);
-        printf(SGR_CLOR(49, 91) "%d" SGR_DEFT, WORLD_WIDTH * WORLD_HEIGHT - lives);
+        printf(SGR_CLOR(49, 91) "%d" SGR_DEFT, cfg->worldWidth * cfg->worldHeight - lives);
 
         // Control Guide
         switch(mode)

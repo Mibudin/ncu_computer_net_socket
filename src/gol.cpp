@@ -11,6 +11,7 @@
 #include"renderer.hpp"
 #include"renderee.hpp"
 #include"pane.hpp"
+#include"config.hpp"
 
 
 void init();
@@ -56,18 +57,20 @@ int main()
 
 void init()
 {
-    wld = new gol::World(WORLD_WIDTH, WORLD_HEIGHT);
+    gol::loadConfig(DEFAULT_CONFIG_FILE);
+
+    wld = new gol::World(gol::cfg->worldWidth, gol::cfg->worldHeight);
     // tta = new gol::Textarea(wld);
     sio = new gol::Screenio();
     kio = new gol::Keyio();
     rer = new gol::Renderer();
 
     wldp = new gol::WorldPane(wld, 2, 1);
-    ttlp = new gol::TitlePane(    16,  3, (WORLD_WIDTH << 1) + 6, 1);
-    infp = new gol::InfoPane(wld, 16, 21, (WORLD_WIDTH << 1) + 6, 4);
-    netp = new gol::NetworkPane((WORLD_WIDTH << 1) + 3, 3, 2, WORLD_HEIGHT + 3);
+    ttlp = new gol::TitlePane(    16,  3, (gol::cfg->worldWidth << 1) + 6, 1);
+    infp = new gol::InfoPane(wld, 16, 21, (gol::cfg->worldWidth << 1) + 6, 4);
+    netp = new gol::NetworkPane((gol::cfg->worldWidth << 1) + 3, 3, 2, gol::cfg->worldHeight + 3);
 
-    dur = std::chrono::milliseconds(gol::turnPeriod);
+    dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
 
     wld->setSampleMap();
 
@@ -114,7 +117,7 @@ void setMap(const int turn)
                 break;
 
             case 'S': case 's':
-                if(y < WORLD_HEIGHT - 1){ANSIES(CUD(1)); y++;}
+                if(y < gol::cfg->worldHeight - 1){ANSIES(CUD(1)); y++;}
                 break;
 
             case 'A': case 'a':
@@ -122,7 +125,7 @@ void setMap(const int turn)
                 break;
 
             case 'D': case 'd':
-                if(x < WORLD_WIDTH - 1){ANSIES(CUF(2)); x++;}
+                if(x < gol::cfg->worldWidth - 1){ANSIES(CUF(2)); x++;}
                 break;
 
             case '[':
@@ -138,14 +141,14 @@ void setMap(const int turn)
                 break;
             
             case ';':
-                if(gol::turnPeriod > 50) gol::turnPeriod -= 50;
-                dur = std::chrono::milliseconds(gol::turnPeriod);
+                if(gol::cfg->turnPeriod > 50) gol::cfg->turnPeriod -= 50;
+                dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
                 reRender = true;
                 break;
 
             case '\'':
-                if(gol::turnPeriod < 1000) gol::turnPeriod += 50;
-                dur = std::chrono::milliseconds(gol::turnPeriod);
+                if(gol::cfg->turnPeriod < 1000) gol::cfg->turnPeriod += 50;
+                dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
                 reRender = true;
                 break;
 
@@ -201,7 +204,7 @@ void loop()
     thR = new gol::Thread({
         [](void* ths){((gol::Renderer*)ths)->renderAll(); return 0;}, rer});
 
-    for(int i = 0; contLoop && i < TURN_MAX; i++)
+    for(int i = 0; contLoop && i < gol::cfg->turnMax; i++)
     {
         tp = std::chrono::steady_clock::now() + dur;
 
@@ -216,13 +219,13 @@ void loop()
             switch(kio->getLastKey())
             {
                 case ';':
-                    if(gol::turnPeriod > 50) gol::turnPeriod -= 50;
-                    dur = std::chrono::milliseconds(gol::turnPeriod);
+                    if(gol::cfg->turnPeriod > 50) gol::cfg->turnPeriod -= 50;
+                    dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
                     break;
 
                 case '\'':
-                    if(gol::turnPeriod < 1000) gol::turnPeriod += 50;
-                    dur = std::chrono::milliseconds(gol::turnPeriod);
+                    if(gol::cfg->turnPeriod < 1000) gol::cfg->turnPeriod += 50;
+                    dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
                     break;
 
                 case '\\':
