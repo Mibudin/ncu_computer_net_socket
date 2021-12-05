@@ -18,6 +18,8 @@ namespace gol
 
     Config::Config(const std::string filename)
     {
+        mode = ModeType::INIT;
+
         mINI::INIFile file(filename);
         mINI::INIStructure ini;
         file.read(ini);

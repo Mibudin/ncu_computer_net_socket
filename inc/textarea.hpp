@@ -5,6 +5,7 @@
 #include"renderee.hpp"
 #include"world.hpp"
 #include"pane.hpp"
+#include"config.hpp"
 
 
 namespace gol
@@ -14,10 +15,10 @@ namespace gol
     //     TOP, MID, BUT
     // };
 
-    enum class ModeType : int
-    {
-        SET, RUN
-    };
+    // enum class ModeType : int
+    // {
+    //     SET, RUN
+    // };
 
 
     // class Textarea : public IRenderee
@@ -55,7 +56,7 @@ namespace gol
         InfoPane(World* wld,
                  const int width, const int height,
                  const int x, const int y);
-        void setMode(const ModeType mode);
+        // void setMode(const ModeType mode);
 
     protected:
         void render() override;
@@ -63,7 +64,7 @@ namespace gol
 
     private:
         World* wld;
-        ModeType mode;
+        // ModeType mode;
     };
 
     class NetworkPane : public Pane

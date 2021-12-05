@@ -13,6 +13,7 @@
 #include"pane.hpp"
 
 
+void preinit();
 void init();
 void setMap(const int turn);
 void loop();
@@ -43,6 +44,8 @@ std::chrono::steady_clock::time_point tp;
 
 int main()
 {
+    preinit();
+
     init();
 
     setMap(0);
@@ -54,9 +57,20 @@ int main()
     return 0;
 }
 
+void preinit()
+{
+    signal(SIGINT,  [](int sig){deinit(); exit(1);});
+    signal(SIGTERM, [](int sig){deinit(); exit(1);});
+
+    printf("Loading configurations...\n");
+    gol::loadConfig(DEFAULT_CONFIG_FILE);
+
+    return;
+}
+
 void init()
 {
-    gol::loadConfig(DEFAULT_CONFIG_FILE);
+    gol::cfg->mode = gol::ModeType::INIT;
 
     wld = new gol::World(gol::cfg->worldWidth, gol::cfg->worldHeight);
     // tta = new gol::Textarea(wld);
@@ -84,9 +98,6 @@ void init()
 
     rer->renderInit();
 
-    signal(SIGINT,  [](int sig){deinit(); exit(1);});
-    signal(SIGTERM, [](int sig){deinit(); exit(1);});
-
     return;
 }
 
@@ -101,7 +112,8 @@ void setMap(const int turn)
     int t = turn & 1;
 
     // tta->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
-    infp->setMode(gol::ModeType::SET);
+    // infp->setMode(gol::ModeType::SET);
+    gol::cfg->mode = gol::ModeType::SET;
 
     rer->renderAll();
 
@@ -194,7 +206,8 @@ void loop()
     bool goDeinit = false;
 
     // tta->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
-    infp->setMode(gol::ModeType::RUN);
+    // infp->setMode(gol::ModeType::RUN);
+    gol::cfg->mode = gol::ModeType::RUN;
 
     kio->startWait();
 
@@ -261,7 +274,8 @@ void loop()
             backSet = false;
             setMap(wld->getTurn());
             // tta->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
-            infp->setMode(gol::ModeType::RUN);
+            // infp->setMode(gol::ModeType::RUN);
+            gol::cfg->mode = gol::ModeType::RUN;
             wld->backTurn();
 
             kio->startWait();
@@ -277,6 +291,8 @@ void loop()
 
 void deinit()
 {
+    gol::cfg->mode = gol::ModeType::CLOSE;
+
     wld->deinit();
     sio->deinitTty();
 

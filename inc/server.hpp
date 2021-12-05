@@ -21,7 +21,7 @@ namespace gol
         bool closeClientSocket();
         std::string getClientIPAddr();
         int getClientPort();
-        void sendMsgPacket(const MsgPacket* pkt);
+        bool sendMsgPacket(const MsgPacket* pkt);
         MsgPacket* recvMsgPacket();
 
     private:

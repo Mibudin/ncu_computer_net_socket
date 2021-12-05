@@ -1,3 +1,5 @@
+#include<string.h>
+#include<stdlib.h>
 #include<unistd.h>
 #include<arpa/inet.h>
 #include<sys/socket.h>
@@ -52,6 +54,30 @@ namespace gol
     int GolClient::getClientPort()
     {
         return cfg->server_port;
+    }
+
+    bool GolClient::sendMsgPacket(const MsgPacket* pkt)
+    {
+        MsgPacket* newPkt = (MsgPacket*)malloc(sizeof(MsgPacket));
+        memcpy(newPkt, pkt, sizeof(MsgPacket));
+        int sendSuc = send(clientSocketFd, newPkt, sizeof(MsgPacket), 0);
+        free(newPkt);
+
+        if(sendSuc == -1) return false;
+        else              return true;
+    }
+
+    MsgPacket* GolClient::recvMsgPacket()
+    {
+        MsgPacket* pkt = (MsgPacket*)malloc(sizeof(MsgPacket));
+        int recvSuc = recv(clientSocketFd, pkt, sizeof(MsgPacket), 0);
+
+        if(recvSuc == -1)
+        {
+            free(pkt);
+            return nullptr;
+        }
+        else return pkt;
     }
 
     void GolClient::setAddr()

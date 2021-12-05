@@ -1,3 +1,5 @@
+#include<stdlib.h>
+#include<string.h>
 #include<unistd.h>
 #include<arpa/inet.h>
 #include<sys/socket.h>
@@ -84,14 +86,28 @@ namespace gol
         return ntohs(clientAddr.sin_port);
     }
 
-    void GolServer::sendMsgPacket(const MsgPacket* pkt)  // TODO
+    bool GolServer::sendMsgPacket(const MsgPacket* pkt)
     {
+        MsgPacket* newPkt = (MsgPacket*)malloc(sizeof(MsgPacket));
+        memcpy(newPkt, pkt, sizeof(MsgPacket));
+        int sendSuc = send(clientSocketFd, newPkt, sizeof(MsgPacket), 0);
+        free(newPkt);
 
+        if(sendSuc == -1) return false;
+        else              return true;
     }
 
-    MsgPacket* GolServer::recvMsgPacket()  // TODO
+    MsgPacket* GolServer::recvMsgPacket()
     {
+        MsgPacket* pkt = (MsgPacket*)malloc(sizeof(MsgPacket));
+        int recvSuc = recv(clientSocketFd, pkt, sizeof(MsgPacket), 0);
 
+        if(recvSuc == -1)
+        {
+            free(pkt);
+            return nullptr;
+        }
+        else return pkt;
     }
 
     void GolServer::setAddr()

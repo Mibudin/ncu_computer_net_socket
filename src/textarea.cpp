@@ -206,21 +206,21 @@ namespace gol
         : Pane(width, height, x, y)
     {
         this->wld = wld;
-        mode = ModeType::SET;
+        // mode = ModeType::SET;
     }
 
-    void InfoPane::setMode(const ModeType mode)
-    {
-        this->mode = mode;
+    // void InfoPane::setMode(const ModeType mode)
+    // {
+    //     this->mode = mode;
 
-        return;
-    }
+    //     return;
+    // }
 
     void InfoPane::render()
     {
         // Phase
         printf(CUP(%d, %d) ECH(12), pos[1] + 1, pos[0] + 2);
-        switch(mode)
+        switch(cfg->mode)
         {
             case ModeType::SET: printf(SGR_CLOR(49, 96) SGR_UDLN "Map " SGR_BDBR "Set" SGR_NOBB " Mode" SGR_DEFT); break;
             case ModeType::RUN: printf(SGR_CLOR(49, 96) SGR_UDLN "Map " SGR_BDBR "Run" SGR_NOBB " Mode" SGR_DEFT); break;
@@ -242,7 +242,7 @@ namespace gol
         printf(SGR_CLOR(49, 91) "%d" SGR_DEFT, cfg->worldWidth * cfg->worldHeight - lives);
 
         // Control Guide
-        switch(mode)
+        switch(cfg->mode)
         {
             case ModeType::SET:
                 printf(CUP(%d, %d) ECH(12), pos[1] + 10, pos[0] + 2);

@@ -5,6 +5,7 @@
 #include<arpa/inet.h>
 #include<sys/socket.h>
 #include<string>
+#include"msgpkt.hpp"
 
 
 namespace gol
@@ -18,6 +19,8 @@ namespace gol
         bool closeSocket();
         std::string getClientIPAddr();
         int getClientPort();
+        bool sendMsgPacket(const MsgPacket* pkt);
+        MsgPacket* recvMsgPacket();
 
     private:
         int clientSocketFd;

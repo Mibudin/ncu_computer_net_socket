@@ -28,6 +28,11 @@ namespace gol
     #define MINI_CASE_SENSITIVE
 
 
+    enum class ModeType : int
+    {
+        INIT = 0, SET, RUN, CLOSE
+    };
+
     // extern int turnPeriod;
 
 
@@ -38,6 +43,7 @@ namespace gol
     {
     public:
         Config(const std::string filename);
+        ModeType mode;
         // sizes
         int screenWidth;
         int screenHeight;

@@ -57,6 +57,9 @@ int main()
 
 void preinit()
 {
+    signal(SIGINT,  [](int sig){deinit(); exit(1);});
+    signal(SIGTERM, [](int sig){deinit(); exit(1);});
+
     printf("Loading configurations...\n");
     gol::loadConfig(DEFAULT_CONFIG_FILE);
 
@@ -71,6 +74,8 @@ void preinit()
 
 void init()
 {
+    gol::cfg->mode = gol::ModeType::INIT;
+
     wld = new gol::World(gol::cfg->worldWidth, gol::cfg->worldHeight);
     sio = new gol::Screenio();
     kio = new gol::Keyio();
@@ -95,9 +100,6 @@ void init()
 
     rer->renderInit();
 
-    signal(SIGINT,  [](int sig){deinit(); exit(1);});
-    signal(SIGTERM, [](int sig){deinit(); exit(1);});
-
     return;
 }
 
@@ -111,7 +113,8 @@ void setMap(const int turn)
     int x = 0, y = 0;
     int t = turn & 1;
 
-    infp->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
+    // infp->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
+    gol::cfg->mode = gol::ModeType::SET;
 
     rer->renderAll();
 
@@ -203,7 +206,8 @@ void loop()
     bool backSet = false;
     bool goDeinit = false;
 
-    infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
+    // infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
+    gol::cfg->mode = gol::ModeType::RUN;
 
     kio->startWait();
 
@@ -262,7 +266,8 @@ void loop()
         {
             backSet = false;
             setMap(wld->getTurn());
-            infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
+            // infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
+            gol::cfg->mode = gol::ModeType::RUN;
             wld->backTurn();
 
             kio->startWait();
@@ -278,6 +283,9 @@ void loop()
 
 void deinit()
 {
+    gol::cfg->mode = gol::ModeType::CLOSE;
+
+    gols->closeClientSocket();
     gols->closeSocket();
 
     wld->deinit();
@@ -295,6 +303,5 @@ void deinit()
     if(thW != nullptr) delete thW;
     if(thR != nullptr) delete thR;
 
-    exit(0);
     return;
 }
