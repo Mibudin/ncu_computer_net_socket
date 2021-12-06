@@ -26,6 +26,9 @@ namespace gol
     {
         serverSocketFd = socket(PF_INET, SOCK_STREAM, 0);
         if(serverSocketFd == -1) return false;
+        // Avoiding [98]: Address already in use
+        int option = 1;
+        setsockopt(serverSocketFd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
         int bindSuc = bind(serverSocketFd, (const sockaddr*)&serverAddr, sizeof(serverAddr));
         if(bindSuc < 0)

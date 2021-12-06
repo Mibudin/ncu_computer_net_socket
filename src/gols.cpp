@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<signal.h>
+#include<errno.h>
+#include<string.h>
 #include<thread>
 #include"config.hpp"
 #include"cell.hpp"
@@ -68,12 +70,20 @@ void preinit()
     gol::loadConfig(DEFAULT_CONFIG_FILE);
 
     gols = new gol::GolServer();
-    gols->createSocket();
+    if(!gols->createSocket())
+    {
+        printf("[Server]: The socket cannot be created. (%d: %s)\n",
+            errno, strerror(errno));
+        // gols->closeSocket();
+        deinit();
+        exit(1);
+    }
     gols->listenSocket();
     printf("[Server]: Waiting for the client...\n");
     if(!gols->acceptClient())
     {
-        printf("[Server]: The client cannot be accepted.\n");
+        printf("[Server]: The client cannot be accepted. (%d: %s)\n",
+            errno, strerror(errno));
         gols->closeSocket();
         deinit();
         exit(1);

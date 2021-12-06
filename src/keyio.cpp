@@ -18,6 +18,7 @@ namespace gol
 
     Keyio::~Keyio()
     {
+        if(kinth) kinth->stop();
         if(kinth) delete kinth;
     }
 
