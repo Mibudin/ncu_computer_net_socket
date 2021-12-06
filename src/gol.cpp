@@ -61,6 +61,7 @@ void preinit()
 {
     signal(SIGINT,  [](int sig){deinit(); exit(1);});
     signal(SIGTERM, [](int sig){deinit(); exit(1);});
+    signal(SIGTSTP, [](int sig){deinit(); exit(1);});
 
     printf("Loading configurations...\n");
     gol::loadConfig(DEFAULT_CONFIG_FILE);

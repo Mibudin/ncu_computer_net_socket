@@ -36,6 +36,7 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<signal.h>
+#include<string.h>
 #include<thread>
 #include"config.hpp"
 #include"cell.hpp"
@@ -48,6 +49,7 @@
 #include"pane.hpp"
 #include"client.hpp"
 #include"msgpkt.hpp"
+#include"keyios.hpp"
 
 
 void preinit();
@@ -59,8 +61,9 @@ void deinit();
 
 gol::World*    wld;
 gol::Screenio* sio;
-gol::Keyio*    kio;
+// gol::Keyio*    kio;
 gol::Renderer* rer;
+// gol::Keyios*   kios;
 
 gol::WorldPane*   wldp;
 gol::TitlePane*   ttlp;
@@ -69,6 +72,7 @@ gol::NetworkPane* netp;
 
 gol::Thread* thW;
 gol::Thread* thR;
+gol::Thread* thC;
 
 std::chrono::steady_clock::duration dur;
 std::chrono::steady_clock::time_point tp;
@@ -96,6 +100,7 @@ void preinit()
 {
     signal(SIGINT,  [](int sig){deinit(); exit(1);});
     signal(SIGTERM, [](int sig){deinit(); exit(1);});
+    signal(SIGTSTP, [](int sig){deinit(); exit(1);});
 
     printf("[Client]: Loading configurations...\n");
     gol::loadConfig(DEFAULT_CONFIG_FILE);
@@ -120,8 +125,9 @@ void init()
 
     wld = new gol::World(gol::cfg->worldWidth, gol::cfg->worldHeight);
     sio = new gol::Screenio();
-    kio = new gol::Keyio();
+    // kio = new gol::Keyio();
     rer = new gol::Renderer();
+    // kios = new gol::Keyios(nullptr, golc);
 
     wldp = new gol::WorldPane(wld, 2, 1);
     ttlp = new gol::TitlePane(    16,  3, (gol::cfg->worldWidth << 1) + 6, 1);
@@ -151,76 +157,114 @@ void setMap(const int turn)
     bool reCount  = false;
     bool reRender = false;
     bool goDeinit = false;
-    char c;
-    int x = 0, y = 0;
+    // char c;
+    // int x = 0, y = 0;
     int t = turn & 1;
 
     // infp->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
     gol::cfg->mode = gol::ModeType::SET;
     netp->setNetworkState(gol::NetworkState::RECV_SET);
     netp->emergRender();
-    golc->checkMode(gol::ModeType::SET);
+    // golc->checkMode(gol::ModeType::SET);
     netp->setNetworkState(gol::NetworkState::SET);
 
     rer->renderAll();
 
-    ANSIES(CUP(2, 4) CUS);
+    ANSIES(CUH);
 
-    while(nextWait && kio->blockWaitKey())  // TODO: thread race condition
+    // kios->startWait();
+
+    // while(nextWait && kio->blockWaitKey())  // TODO: thread race condition
+    // while(nextWait && kios->waitKey())
+    gol::MsgPacket* pkt;
+    while(nextWait)
     {
-        switch(c = kio->getLastKey())
+        // switch(c = kio->getLastKey())
+        // // switch(c = kios->getLastKey())
+        // {
+        //     case 'W': case 'w':
+        //         if(y > 0){ANSIES(CUU(1)); y--;}
+        //         break;
+
+        //     case 'S': case 's':
+        //         if(y < gol::cfg->worldHeight - 1){ANSIES(CUD(1)); y++;}
+        //         break;
+
+        //     case 'A': case 'a':
+        //         if(x > 0){ANSIES(CUB(2)); x--;}
+        //         break;
+
+        //     case 'D': case 'd':
+        //         if(x < gol::cfg->worldWidth - 1){ANSIES(CUF(2)); x++;}
+        //         break;
+
+        //     case '[':
+        //         wld->getCell(x, y)->setStatus(gol::CellStatus::DEAD, t);
+        //         reCount = true;
+        //         reRender = true;
+        //         break;
+
+        //     case ']':
+        //         wld->getCell(x, y)->setStatus(gol::CellStatus::LIVE, t);
+        //         reCount = true;
+        //         reRender = true;
+        //         break;
+            
+        //     case ';':
+        //         if(gol::cfg->turnPeriod > 50) gol::cfg->turnPeriod -= 50;
+        //         dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
+        //         reRender = true;
+        //         break;
+
+        //     case '\'':
+        //         if(gol::cfg->turnPeriod < 1000) gol::cfg->turnPeriod += 50;
+        //         dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
+        //         reRender = true;
+        //         break;
+
+        //     case '\\':
+        //         nextWait = false;
+        //         break;
+            
+        //     case 'P': case 'p':
+        //         nextWait = false;
+        //         goDeinit = true;
+        //         break;
+
+        //     case -1: default:
+        //         // printf("> %d\n", c);
+        //         break;
+        // }
+
+        pkt = golc->recvMsgPacket();
+
+        switch(pkt->type)
         {
-            case 'W': case 'w':
-                if(y > 0){ANSIES(CUU(1)); y--;}
-                break;
-
-            case 'S': case 's':
-                if(y < gol::cfg->worldHeight - 1){ANSIES(CUD(1)); y++;}
-                break;
-
-            case 'A': case 'a':
-                if(x > 0){ANSIES(CUB(2)); x--;}
-                break;
-
-            case 'D': case 'd':
-                if(x < gol::cfg->worldWidth - 1){ANSIES(CUF(2)); x++;}
-                break;
-
-            case '[':
-                wld->getCell(x, y)->setStatus(gol::CellStatus::DEAD, t);
+            case gol::MsgType::CELL:
+                wld->getCell(((gol::MsgPacket_Cell*)pkt)->x, ((gol::MsgPacket_Cell*)pkt)->y)
+                    ->setStatus(((gol::MsgPacket_Cell*)pkt)->status, t);
                 reCount = true;
                 reRender = true;
                 break;
 
-            case ']':
-                wld->getCell(x, y)->setStatus(gol::CellStatus::LIVE, t);
-                reCount = true;
-                reRender = true;
-                break;
-            
-            case ';':
-                if(gol::cfg->turnPeriod > 50) gol::cfg->turnPeriod -= 50;
+            case gol::MsgType::TP:
+                gol::cfg->turnPeriod = ((gol::MsgPacket_TP*)pkt)->tp;
                 dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
                 reRender = true;
                 break;
 
-            case '\'':
-                if(gol::cfg->turnPeriod < 1000) gol::cfg->turnPeriod += 50;
-                dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
-                reRender = true;
-                break;
+            case gol::MsgType::MODE:
+                switch(((gol::MsgPacket_Mode*)pkt)->mode)
+                {
+                    case gol::ModeType::RUN:
+                        nextWait = false;
+                        break;
 
-            case '\\':
-                nextWait = false;
-                break;
-            
-            case 'P': case 'p':
-                nextWait = false;
-                goDeinit = true;
-                break;
-
-            case -1: default:
-                // printf("> %d\n", c);
+                    case gol::ModeType::CLOSE:
+                        nextWait = false;
+                        goDeinit = true;
+                        break;
+                }
                 break;
         }
 
@@ -237,6 +281,10 @@ void setMap(const int turn)
             ANSIES(RCP CUS);
             reRender = false;
         }
+
+        // if(nextWait) kios->startWait();
+
+        free(pkt);
     }
 
     ANSIES(CUH);
@@ -256,15 +304,18 @@ void loop()
     gol::cfg->mode = gol::ModeType::RUN;
     netp->setNetworkState(gol::NetworkState::RECV_RUN);
     netp->emergRender();
-    golc->checkMode(gol::ModeType::RUN);
+    // golc->checkMode(gol::ModeType::RUN);
     netp->setNetworkState(gol::NetworkState::RUN);
 
-    kio->startWait();
+    // kio->startWait();
+    // kios->startWait();
 
     thW = new gol::Thread({
         [](void* ths){return ((gol::World*)ths)->goTurn();}, wld});
     thR = new gol::Thread({
         [](void* ths){((gol::Renderer*)ths)->renderAll(); return 0;}, rer});
+    thC = new gol::Thread({
+        [](void* ths){free(((gol::GolClient*)ths)->recvMsgPacket()); return 0;}, golc});
 
     for(int i = 0; contLoop && i < gol::cfg->turnMax; i++)
     {
@@ -272,38 +323,83 @@ void loop()
 
         thW->nextPromise(); thW->storrs();
         thR->nextPromise(); thR->storrs();
+        thC->nextPromise(); thC->storrs();
 
-        while(kio->waitKeyAsync(tp))
+        // kios->startWait();
+
+        // while(kio->waitKeyAsync(tp))
+        // // while(kios->waitKeyAsync(tp))
+        // {
+        //     bool nextWait = true;
+        //     switch(kio->getLastKey())
+        //     // switch(kios->getLastKey())
+        //     {
+        //         case ';':
+        //             if(gol::cfg->turnPeriod > 50) gol::cfg->turnPeriod -= 50;
+        //             dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
+        //             break;
+
+        //         case '\'':
+        //             if(gol::cfg->turnPeriod < 1000) gol::cfg->turnPeriod += 50;
+        //             dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
+        //             break;
+
+        //         case '\\':
+        //             backSet = true;
+        //             nextWait = false;
+        //             break;
+
+        //         case 'P': case 'p':
+        //             goDeinit = true;
+        //             nextWait = false;
+        //             contLoop = false;
+        //             break;
+
+        //         case -1: default:
+        //             break;
+        //     }
+        //     if(nextWait) kio->startWait();
+        //     // if(nextWait) kios->startWait();
+        //     else         break;
+        // }
+
+        while(thC->currentPromise()->wait_until(tp) == std::future_status::ready)
         {
+            gol::MsgPacket* pkt = (gol::MsgPacket*)malloc(sizeof(gol::MsgPacket));
+            memcpy(pkt, &(golc->lastRecvPkt), sizeof(gol::MsgPacket));
+
             bool nextWait = true;
-            switch(kio->getLastKey())
+            switch(pkt->type)
             {
-                case ';':
-                    if(gol::cfg->turnPeriod > 50) gol::cfg->turnPeriod -= 50;
+                case gol::MsgType::TP:
+                    gol::cfg->turnPeriod = ((gol::MsgPacket_TP*)pkt)->tp;
                     dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
                     break;
 
-                case '\'':
-                    if(gol::cfg->turnPeriod < 1000) gol::cfg->turnPeriod += 50;
-                    dur = std::chrono::milliseconds(gol::cfg->turnPeriod);
-                    break;
+                case gol::MsgType::MODE:
+                    switch(((gol::MsgPacket_Mode*)pkt)->mode)
+                    {
+                        case gol::ModeType::SET:
+                            backSet = true;
+                            nextWait = false;
+                            break;
 
-                case '\\':
-                    backSet = true;
-                    nextWait = false;
-                    break;
-
-                case 'P': case 'p':
-                    goDeinit = true;
-                    nextWait = false;
-                    contLoop = false;
-                    break;
-
-                case -1: default:
+                        case gol::ModeType::CLOSE:
+                            goDeinit = true;
+                            nextWait = false;
+                            contLoop = false;
+                            break;
+                    }
                     break;
             }
-            if(nextWait) kio->startWait();
-            else         break;
+            free(pkt);
+
+            if(nextWait)
+            {
+                thC->nextPromise();
+                thC->storrs();
+            }
+            else break;
         }
 
         thW->currentPromise()->wait();  // Process turn i + 1 complete
@@ -321,12 +417,13 @@ void loop()
             gol::cfg->mode = gol::ModeType::RUN;
             netp->setNetworkState(gol::NetworkState::SEND_RUN);
             netp->emergRender();
-            golc->checkMode(gol::ModeType::RUN);
+            // golc->checkMode(gol::ModeType::RUN);
             netp->setNetworkState(gol::NetworkState::RUN);
 
             wld->backTurn();
 
-            kio->startWait();
+            // kio->startWait();
+            // kios->startWait();
         }
 
         wld->nextTurn();
@@ -342,7 +439,7 @@ void deinit()
     gol::cfg->mode = gol::ModeType::CLOSE;
     if(netp) netp->setNetworkState(gol::NetworkState::SEND_CLOSE);
     if(netp) netp->emergRender();
-    if(golc) golc->checkMode(gol::ModeType::CLOSE);
+    // if(golc) golc->checkMode(gol::ModeType::CLOSE);  // TODO
     if(netp) netp->setNetworkState(gol::NetworkState::CLOSE);
     if(netp) netp->emergRender();
 
@@ -354,8 +451,9 @@ void deinit()
 
     if(wld) delete wld;
     if(sio) delete sio;
-    if(kio) delete kio;
+    // if(kio) delete kio;
     if(rer) delete rer;
+    // if(kios) delete kios;
 
     if(wldp) delete wldp;
     if(ttlp) delete ttlp;
@@ -364,6 +462,7 @@ void deinit()
 
     if(thW) delete thW;
     if(thR) delete thR;
+    if(thC) delete thC;
 
     return;
 }

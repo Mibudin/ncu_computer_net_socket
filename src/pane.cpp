@@ -2,6 +2,7 @@
 #include<vector>
 #include"pane.hpp"
 #include"screenio.hpp"
+#include"config.hpp"
 
 
 namespace gol
@@ -55,7 +56,9 @@ namespace gol
         printf(CUP(%d, %d), pos[1] + 1, pos[0]);
         for(int i = 0; i < size[1] - 2; i++) printf(DEC_VFHN CUB(1) CUD(1));
         printf(CUP(%d, %d), pos[1] + 1, pos[0] + size[0] - 1);
-        for(int i = 0; i < size[1] - 2; i++) printf(DEC_VFHN CUB(1) CUD(1));
+        if(pos[0] + size[0] - 1 == cfg->screenWidth)
+             for(int i = 0; i < size[1] - 2; i++) printf(DEC_VFHN CUD(1));
+        else for(int i = 0; i < size[1] - 2; i++) printf(DEC_VFHN CUB(1) CUD(1));
 
         ANSIES(DEC(B));
 

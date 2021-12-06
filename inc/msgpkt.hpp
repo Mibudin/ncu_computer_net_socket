@@ -10,7 +10,7 @@ namespace gol
 {
     enum class MsgType : int
     {
-        TEMP = 0, CELL, KEY, MODE
+        TEMP = 0, CELL, TP, KEY, MODE
     };
 
     struct MsgPacket
@@ -26,6 +26,13 @@ namespace gol
         int y;
         CellStatus status;
         char _rest[0];
+    };
+
+    struct MsgPacket_TP
+    {
+        MsgType type = MsgType::TP;
+        int tp;
+        char _rest[8];
     };
 
     struct MsgPacket_Key

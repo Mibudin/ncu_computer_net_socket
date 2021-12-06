@@ -34,6 +34,9 @@ namespace gol
         std::future<int>* asyncRecvMsgPacket();
         bool sendKey(const int key);
         bool sendMode(const ModeType mode);
+        bool sendCell(const int x, const int y, const CellStatus status);
+        bool sendTP(const int tp);
+        int recvKey();
 
     private:
         bool connected;

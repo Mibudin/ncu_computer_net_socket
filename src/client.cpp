@@ -16,6 +16,8 @@ namespace gol
 
         clientSocketFd = -1;
 
+        th = new Thread({nullptr, nullptr});
+
         setAddr();
     }
 
@@ -82,7 +84,25 @@ namespace gol
             free(pkt);
             return nullptr;
         }
-        else return pkt;
+        else
+        {
+            memcpy(&lastRecvPkt, pkt, sizeof(MsgPacket));
+            return pkt;
+        }
+    }
+
+    std::future<int>* GolClient::asyncRecvMsgPacket()
+    {
+        th->setTask({
+            [](void* ths){
+                ((GolClient*)ths)->lastRecvPkt = *(((GolClient*)ths)->recvMsgPacket());
+                return 0;},
+            this
+        });
+        std::future<int>* f = th->nextPromise();
+        th->storrs();
+
+        return f;
     }
 
     bool GolClient::checkMode(const ModeType mode)
@@ -98,6 +118,30 @@ namespace gol
         }
 
         return true;
+    }
+
+    bool GolClient::sendKey(const int key)
+    {
+        while(!sendMsgPacket((MsgPacket*)(new MsgPacket_Key(
+            {gol::MsgType::KEY, key}))));
+        return true;
+    }
+
+    int GolClient::recvKey()
+    {
+        MsgPacket* pkt;
+        while(true)
+        {
+            pkt = recvMsgPacket();
+            if(pkt == nullptr) return -1;
+            if(pkt->type == MsgType::KEY)
+            {
+                int key = ((MsgPacket_Key*)pkt)->key;
+                free(pkt);
+                return key;
+            }
+        }
+        return -1;
     }
 
     void GolClient::setAddr()

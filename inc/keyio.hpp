@@ -15,6 +15,7 @@ namespace gol
     {
     public:
         Keyio();
+        ~Keyio();
         void startWait();
         bool waitKeyAsync(const std::chrono::steady_clock::time_point time);
         int getLastKey();

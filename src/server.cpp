@@ -160,15 +160,50 @@ namespace gol
 
     bool GolServer::sendKey(const int key)
     {
-        return sendMsgPacket((MsgPacket*)(new MsgPacket_Key(
-            {gol::MsgType::MODE, key})));
+        while(!sendMsgPacket((MsgPacket*)(new MsgPacket_Key(
+            {gol::MsgType::KEY, key}))));
+        return true;
     }
 
     bool GolServer::sendMode(const ModeType mode)
     {
         if(!connected) return false;
-        return sendMsgPacket((MsgPacket*)(new MsgPacket_Mode(
-            {gol::MsgType::MODE, mode})));
+        while(!sendMsgPacket((MsgPacket*)(new MsgPacket_Mode(
+            {gol::MsgType::MODE, mode}))));
+        return true;
+    }
+
+    bool GolServer::sendCell(const int x, const int y, const CellStatus status)
+    {
+        if(!connected) return false;
+        while(!sendMsgPacket((MsgPacket*)(new MsgPacket_Cell(
+            {gol::MsgType::CELL, x, y, status}))));
+        return true;
+    }
+
+    bool GolServer::sendTP(const int tp)
+    {
+        if(!connected) return false;
+        while(!sendMsgPacket((MsgPacket*)(new MsgPacket_TP(
+            {gol::MsgType::TP, tp}))));
+        return true;
+    }
+
+    int GolServer::recvKey()
+    {
+        MsgPacket* pkt;
+        while(true)
+        {
+            pkt = recvMsgPacket();
+            if(pkt == nullptr) return -1;
+            if(pkt->type == MsgType::KEY)
+            {
+                int key = ((MsgPacket_Key*)pkt)->key;
+                free(pkt);
+                return key;
+            }
+        }
+        return -1;
     }
 
     void GolServer::setAddr()

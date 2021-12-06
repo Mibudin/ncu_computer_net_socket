@@ -16,6 +16,11 @@ namespace gol
         // kinf == nullptr;
     }
 
+    Keyio::~Keyio()
+    {
+        if(kinth) delete kinth;
+    }
+
     void Keyio::startWait()
     {
         // kin = std::async(std::launch::async, &gol::Keyio::blockWaitKey, this);
