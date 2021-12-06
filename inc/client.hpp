@@ -17,12 +17,15 @@ namespace gol
         bool createSocket();
         bool connectServer();
         bool closeSocket();
-        std::string getClientIPAddr();
-        int getClientPort();
+        std::string getServerIPAddr();
+        int getServerPort();
+
         bool sendMsgPacket(const MsgPacket* pkt);
         MsgPacket* recvMsgPacket();
+        bool checkMode(const ModeType mode);
 
     private:
+        bool connected;
         int clientSocketFd;
         sockaddr_in serverAddr;
         void setAddr();

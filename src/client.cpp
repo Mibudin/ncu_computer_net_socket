@@ -12,6 +12,8 @@ namespace gol
 {
     GolClient::GolClient()
     {
+        connected = false;
+
         clientSocketFd = -1;
 
         setAddr();
@@ -30,28 +32,31 @@ namespace gol
         int conSuc = connect(clientSocketFd, (sockaddr*)&serverAddr, sizeof(serverAddr));
         if(conSuc == -1)
         {
-            close(clientSocketFd);
-            clientSocketFd = -1;
+            // closeSocket();
             return false;
         }
+        connected = true;
 
         return true;
     }
 
     bool GolClient::closeSocket()
     {
+        if(!connected) return false;
+
         if(close(clientSocketFd) < 0) return false;
         clientSocketFd = -1;
+        connected = false;
 
         return true;
     }
 
-    std::string GolClient::getClientIPAddr()
+    std::string GolClient::getServerIPAddr()
     {
         return cfg->server_ip_addr;
     }
     
-    int GolClient::getClientPort()
+    int GolClient::getServerPort()
     {
         return cfg->server_port;
     }
@@ -78,6 +83,21 @@ namespace gol
             return nullptr;
         }
         else return pkt;
+    }
+
+    bool GolClient::checkMode(const ModeType mode)
+    {
+        if(!connected) return false;
+
+        gol::MsgPacket_Mode* pkt;
+        while(true)
+        {
+            pkt = (gol::MsgPacket_Mode*)(recvMsgPacket());
+            if(pkt->type == gol::MsgType::MODE
+                && pkt->mode == mode) break;
+        }
+
+        return true;
     }
 
     void GolClient::setAddr()

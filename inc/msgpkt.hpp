@@ -13,7 +13,7 @@ namespace gol
         TEMP = 0, CELL, KEY, MODE
     };
 
-    struct MsgPacket_Temp
+    struct MsgPacket
     {
         MsgType type = MsgType::TEMP;
         char _rest[12];
@@ -42,22 +42,22 @@ namespace gol
         char _rest[8];
     };
 
-    union MsgPacket
-    {
-        MsgPacket_Temp temp;
-        MsgPacket_Cell cell;
-        MsgPacket_Key  key;
-        MsgPacket_Mode mode;
-    };
+    // union MsgPacket
+    // {
+    //     MsgPacket_Temp temp;
+    //     MsgPacket_Cell cell;
+    //     MsgPacket_Key  key;
+    //     MsgPacket_Mode mode;
+    // };
 
-    void _()
-    {
-        sizeof(MsgPacket_Temp);
-        sizeof(MsgPacket_Cell);
-        sizeof(MsgPacket_Key);
-        sizeof(MsgPacket_Mode);
-        sizeof(MsgPacket);
-    }
+    // void _()
+    // {
+    //     sizeof(MsgPacket);
+    //     sizeof(MsgPacket_Cell);
+    //     sizeof(MsgPacket_Key);
+    //     sizeof(MsgPacket_Mode);
+    //     // sizeof(MsgPacket);
+    // }
 }
 
 #endif

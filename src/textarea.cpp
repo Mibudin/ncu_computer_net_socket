@@ -322,6 +322,7 @@ namespace gol
     {
         ipAddr = "";
         port = 0;
+        state = NetworkState::INIT;
     }
 
     void NetworkPane::setConnect(const std::string ipAddr, const int port)
@@ -330,8 +331,70 @@ namespace gol
         this->port = port;
     }
 
+    void NetworkPane::setNetworkState(const NetworkState state)  // TODO
+    {
+        this->state = state;
+
+        return;
+    }
+
+    void NetworkPane::emergRender()  // TODO
+    {
+        render();
+
+        return;
+    }
+
     void NetworkPane::render()  // TODO
     {
+        if(port == 0) return;
+
+        printf(CUP(%d, %d) ECH(30), pos[1] + 1, pos[0] + 27);
+        switch(state)
+        {
+            case NetworkState::INIT:
+                break;
+
+            case NetworkState::CONNECTED:
+                break;
+
+            case NetworkState::SEND_SET:
+                printf("Sending SET...");
+                break;
+
+            case NetworkState::RECV_SET:
+                printf("Receiving SET...");
+                break;
+            
+            case NetworkState::SET:
+                printf("In SET...");
+                break;
+
+            case NetworkState::SEND_RUN:
+                printf("Sending RUN...");
+                break;
+            
+            case NetworkState::RECV_RUN:
+                printf("Receiving RUN...");
+                break;
+
+            case NetworkState::RUN:
+                printf("In RUN...");
+                break;
+
+            case NetworkState::SEND_CLOSE:
+                printf("Sending CLOSE...");
+                break;
+
+            case NetworkState::RECV_CLOSE:
+                printf("Receiving CLOSE...");
+                break;
+
+            case NetworkState::CLOSE:
+                printf("In CLOSE...");
+                break;
+        }
+
         return;
     }
 
@@ -343,7 +406,7 @@ namespace gol
         if(port == 0) return;
 
         printf(CUP(%d, %d), pos[1] + 1, pos[0] + 2);
-        printf(SGR_CLOR(49, 94) SGR_BDBR "%s" SGR_DEFT ":%d", ipAddr, port);
+        printf(SGR_CLOR(49, 94) SGR_BDBR "%s" SGR_DEFT ":%d", ipAddr.c_str(), port);
 
         return;
     }

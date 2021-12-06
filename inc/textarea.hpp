@@ -67,12 +67,22 @@ namespace gol
         // ModeType mode;
     };
 
+    enum class NetworkState : int
+    {
+        INIT = 0, CONNECTED,
+        SEND_SET,   RECV_SET,   SET,
+        SEND_RUN,   RECV_RUN,   RUN,
+        SEND_CLOSE, RECV_CLOSE, CLOSE,
+    };
+
     class NetworkPane : public Pane
     {
     public:
         NetworkPane(const int width, const int height,
                     const int x, const int y);
         void setConnect(const std::string ipAddr, const int port);
+        void setNetworkState(const NetworkState state);
+        void emergRender();
     
     protected:
         void render() override;
@@ -81,6 +91,7 @@ namespace gol
     private:
         std::string ipAddr;
         int port;
+        NetworkState state;
     };
 }
 

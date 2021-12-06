@@ -100,6 +100,15 @@ namespace gol
         else              resume();
     }
 
+    void Thread::setTask(ThreadTask task)
+    {
+        if(th != nullptr || !pauseFlag) return;
+
+        this->task = task;
+
+        return;
+    }
+
     void Thread::pause()
     {
         if(th == nullptr) return;

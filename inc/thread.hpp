@@ -36,6 +36,7 @@ namespace gol
         void stop();
         void resume();
         void storrs();
+        void setTask(ThreadTask task);
 
     private:
         ThreadTask task;

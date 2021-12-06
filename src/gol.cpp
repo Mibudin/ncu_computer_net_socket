@@ -305,6 +305,7 @@ void deinit()
     delete wldp;
     delete ttlp;
     delete infp;
+    delete netp;
 
     if(thW != nullptr) delete thW;
     if(thR != nullptr) delete thR;

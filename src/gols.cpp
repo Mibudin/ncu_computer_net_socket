@@ -12,6 +12,7 @@
 #include"renderee.hpp"
 #include"pane.hpp"
 #include"server.hpp"
+#include"msgpkt.hpp"
 
 
 void preinit();
@@ -60,13 +61,13 @@ void preinit()
     signal(SIGINT,  [](int sig){deinit(); exit(1);});
     signal(SIGTERM, [](int sig){deinit(); exit(1);});
 
-    printf("Loading configurations...\n");
+    printf("[Server]: Loading configurations...\n");
     gol::loadConfig(DEFAULT_CONFIG_FILE);
 
     gols = new gol::GolServer();
     gols->createSocket();
     gols->listenSocket();
-    printf("Waiting for the client...\n");
+    printf("[Server]: Waiting for the client...\n");
     gols->acceptClient();
 
     return;
@@ -115,13 +116,18 @@ void setMap(const int turn)
 
     // infp->setMode(gol::ModeType::SET);  // TODO: Mode in main logic
     gol::cfg->mode = gol::ModeType::SET;
+    netp->setNetworkState(gol::NetworkState::SEND_SET);
+    netp->emergRender();
+    gols->sendMode(gol::ModeType::SET);
+    netp->setNetworkState(gol::NetworkState::SET);
 
     rer->renderAll();
 
     ANSIES(CUP(2, 4) CUS);
 
-    while(nextWait && kio->blockWaitKey())
+    while(nextWait && kio->blockWaitKey())  // TODO: thread race condition
     {
+
         switch(c = kio->getLastKey())
         {
             case 'W': case 'w':
@@ -208,6 +214,10 @@ void loop()
 
     // infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
     gol::cfg->mode = gol::ModeType::RUN;
+    netp->setNetworkState(gol::NetworkState::SEND_RUN);
+    netp->emergRender();
+    gols->sendMode(gol::ModeType::RUN);
+    netp->setNetworkState(gol::NetworkState::RUN);
 
     kio->startWait();
 
@@ -266,8 +276,14 @@ void loop()
         {
             backSet = false;
             setMap(wld->getTurn());
+
             // infp->setMode(gol::ModeType::RUN);  // TODO: Mode in main logic
             gol::cfg->mode = gol::ModeType::RUN;
+            netp->setNetworkState(gol::NetworkState::SEND_RUN);
+            netp->emergRender();
+            gols->sendMode(gol::ModeType::RUN);
+            netp->setNetworkState(gol::NetworkState::RUN);
+
             wld->backTurn();
 
             kio->startWait();
@@ -284,24 +300,31 @@ void loop()
 void deinit()
 {
     gol::cfg->mode = gol::ModeType::CLOSE;
+    if(netp) netp->setNetworkState(gol::NetworkState::SEND_CLOSE);
+    if(netp) netp->emergRender();
+    if(gols) gols->sendMode(gol::ModeType::CLOSE);
+    if(netp) netp->setNetworkState(gol::NetworkState::CLOSE);
+    if(netp) netp->emergRender();
 
-    gols->closeClientSocket();
-    gols->closeSocket();
+    if(gols) gols->closeClientSocket();
+    if(gols) gols->closeSocket();
+    if(gols) delete gols;
 
-    wld->deinit();
-    sio->deinitTty();
+    if(wld) wld->deinit();
+    if(sio) sio->deinitTty();
 
-    delete wld;
-    delete sio;
-    delete kio;
-    delete rer;
+    if(wld) delete wld;
+    if(sio) delete sio;
+    if(kio) delete kio;
+    if(rer) delete rer;
 
-    delete wldp;
-    delete ttlp;
-    delete infp;
+    if(wldp) delete wldp;
+    if(ttlp) delete ttlp;
+    if(infp) delete infp;
+    if(netp) delete netp;
 
-    if(thW != nullptr) delete thW;
-    if(thR != nullptr) delete thR;
+    if(thW) delete thW;
+    if(thR) delete thR;
 
     return;
 }

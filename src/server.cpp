@@ -12,8 +12,12 @@ namespace gol
 {
     GolServer::GolServer()
     {
+        connected = false;
+
         serverSocketFd = -1;
         clientSocketFd = -1;
+
+        th = new Thread({nullptr, nullptr});
     
         setAddr();
     }
@@ -53,14 +57,18 @@ namespace gol
         size_t clientAddrLen = sizeof(clientAddr);
         clientSocketFd = accept(serverSocketFd, (sockaddr*)&clientAddr, &clientAddrLen);
         if(clientSocketFd == -1) return false;
+        connected = true;
 
         return true;
     }
 
     bool GolServer::closeSocket()
     {
+        if(!connected) return false;
+
         if(close(serverSocketFd) < 0) return false;
         serverSocketFd = -1;
+        connected = false;
 
         return true;
     }
@@ -77,6 +85,7 @@ namespace gol
     {
         char ipAddr[20];
         inet_ntop(AF_INET, &clientAddr.sin_addr.s_addr, ipAddr, sizeof(ipAddr));
+        printf("> %s\n", ipAddr);
 
         return std::string(ipAddr);
     }
@@ -85,6 +94,16 @@ namespace gol
     {
         return ntohs(clientAddr.sin_port);
     }
+
+    // MsgPacket GolServer::getLastSendPkt()
+    // {
+    //     return lastSendPkt;
+    // }
+
+    // MsgPacket GolServer::getLastRecvPkt()
+    // {
+    //     return lastRecvPkt;
+    // }
 
     bool GolServer::sendMsgPacket(const MsgPacket* pkt)
     {
@@ -108,6 +127,48 @@ namespace gol
             return nullptr;
         }
         else return pkt;
+    }
+
+    std::future<int>* GolServer::asyncSendMsgPacket(const MsgPacket* pkt)
+    {
+        lastSendPkt = *pkt;
+        th->setTask({
+            [](void* ths){
+                return (int)((GolServer*)ths)->sendMsgPacket(
+                    &(((GolServer*)ths)->lastSendPkt));},
+            this
+        });
+        std::future<int>* f = th->nextPromise();
+        th->storrs();
+
+        return f;
+    }
+
+    std::future<int>* GolServer::asyncRecvMsgPacket()
+    {
+        th->setTask({
+            [](void* ths){
+                ((GolServer*)ths)->lastRecvPkt = *(((GolServer*)ths)->recvMsgPacket());
+                return 0;},
+            this
+        });
+        std::future<int>* f = th->nextPromise();
+        th->storrs();
+
+        return f;
+    }
+
+    bool GolServer::sendKey(const int key)
+    {
+        return sendMsgPacket((MsgPacket*)(new MsgPacket_Key(
+            {gol::MsgType::MODE, key})));
+    }
+
+    bool GolServer::sendMode(const ModeType mode)
+    {
+        if(!connected) return false;
+        return sendMsgPacket((MsgPacket*)(new MsgPacket_Mode(
+            {gol::MsgType::MODE, mode})));
     }
 
     void GolServer::setAddr()
