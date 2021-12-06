@@ -29,8 +29,8 @@ namespace gol
     void Thread::deletePromise()
     {
         promiseFlag = false;
-        if(*p) delete (*p);
         if(f) delete f;
+        if(*p) delete (*p);
     }
 
     std::future<int>* Thread::nextPromise()

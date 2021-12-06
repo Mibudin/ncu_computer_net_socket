@@ -62,9 +62,9 @@ int main()
 
 void preinit()
 {
-    signal(SIGINT,  [](int sig){deinit(); exit(1);});
-    signal(SIGTERM, [](int sig){deinit(); exit(1);});
-    signal(SIGTSTP, [](int sig){deinit(); exit(1);});
+    signal(SIGINT,  [](int sig){deinit(); exit(0);});
+    signal(SIGTERM, [](int sig){deinit(); exit(0);});
+    signal(SIGTSTP, [](int sig){deinit(); exit(0);});
 
     printf("[Server]: Loading configurations...\n");
     gol::loadConfig(DEFAULT_CONFIG_FILE);
@@ -88,6 +88,8 @@ void preinit()
         deinit();
         exit(1);
     }
+    printf("[Server]: The client from %s:%d.\n",
+        gols->getClientIPAddr().c_str(), gols->getClientPort());
 
     return;
 }
@@ -342,6 +344,7 @@ void loop()
 void deinit()
 {
     gol::cfg->mode = gol::ModeType::CLOSE;
+
     if(netp) netp->setNetworkState(gol::NetworkState::SEND_CLOSE);
     if(netp) netp->emergRender();
     // if(gols) gols->sendMode(gol::ModeType::CLOSE);
@@ -368,6 +371,8 @@ void deinit()
 
     if(thW) delete thW;
     if(thR) delete thR;
+
+    exit(0);
 
     return;
 }

@@ -115,6 +115,8 @@ void preinit()
         deinit();
         exit(1);
     }
+    printf("[Client]: The server from %s:%d.\n",
+        golc->getServerIPAddr().c_str(), golc->getServerPort());
 
     return;
 }
@@ -463,6 +465,8 @@ void deinit()
     if(thW) delete thW;
     if(thR) delete thR;
     if(thC) delete thC;
+
+    exit(0);
 
     return;
 }

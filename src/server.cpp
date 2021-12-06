@@ -88,7 +88,6 @@ namespace gol
     {
         char ipAddr[20];
         inet_ntop(AF_INET, &clientAddr.sin_addr.s_addr, ipAddr, sizeof(ipAddr));
-        printf("> %s\n", ipAddr);
 
         return std::string(ipAddr);
     }
